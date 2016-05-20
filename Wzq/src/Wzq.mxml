@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" width="500" height="600" creationComplete="windowedapplication1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.graphics.SolidColor;
+			import mx.graphics.SolidColorStroke;
+			
+			import spark.primitives.Ellipse;
+			import spark.primitives.Line;
+			
+			//棋子的直径
+			private var radios:int=22;
+			//边的间隔
+			private var padding:int=20;
+			//线条的多少，代表五子棋的难度
+			private var totalsize:int=15;
+			//棋子的数组
+			private var boardArray:Array;
+			//默认的颜色，与背景色一致
+			private const DEFAULT_COLOR:SolidColor=new SolidColor(0xC3D6E3,0);
+			//黑棋
+			private const BLACK_COLOR:SolidColor=new SolidColor(0x000000,1);
+			//白棋
+			private const WHITE_COLOR:SolidColor=new SolidColor(0xffffff,1);
+			//玩家一
+			private const PLAYER_ONE_TURN:int=0;
+			//玩家二
+			private const PLAYER_TWO_TURN:int=1;
+			//当前玩家
+			private var turn:int=PLAYER_ONE_TURN;
+
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				for(var i:int=0;i<=totalsize;i++)  //画水平线
+				{
+					var line:Line=new Line();  //定义直线对象，并初始化
+					line.xFrom=0+padding;
+					line.xTo=board.width-padding;
+					line.y=padding+i*(board.height-2*padding)/totalsize;
+					line.stroke=new SolidColorStroke(0x000000,1,1);
+					board.addElement(line);
+				}
+				for(var i:int=0;i<=totalsize;i++)  //画垂直线
+				{
+					var line:Line=new Line();  //定义直线对象，并初始化
+					line.yFrom=0+padding;
+					line.yTo=board.height-padding;
+					line.x=padding+i*(board.width-2*padding)/totalsize;
+					line.stroke=new SolidColorStroke(0x000000,1,1);
+					board.addElement(line);
+				}
+				//画棋子
+				boardArray=new Array(); 
+				for(var x:int=0;x<=totalsize;x++)
+				{
+					boardArray[x]=new Array();
+					for(var y:int=0;y<=totalsize;y++)
+					{
+						var ellipse:Ellipse=new Ellipse();   //定义椭圆
+						ellipse.width=radios;
+						ellipse.height=radios;
+						ellipse.x=padding+x*(board.width-2*padding)/totalsize-radios/2;   
+						ellipse.y=padding+y*(board.height-2*padding)/totalsize-radios/2;
+						ellipse.fill=DEFAULT_COLOR;
+						board.addElement(ellipse);
+						boardArray[x][y]=ellipse;
+					}
+				}
+			}
+			
+			protected function boardHandler(event:MouseEvent):void
+			{
+				var posx:int=event.localX;
+				var posy:int=event.localY;
+				var clickEllipse:Ellipse;
+			
+				for(var x:int=0;x<=totalsize;x++)  //如果在棋子区域内点击
+				{		
+					for(var y:int=0;y<=totalsize;y++)
+					{
+						var ellipse:Ellipse=boardArray[x][y] as Ellipse;
+						if(posx>=ellipse.x&&posx<=(ellipse.x+radios)&&posy>=ellipse.y&&posy<=(ellipse.y+radios))  
+						{
+							clickEllipse=ellipse;
+							break;
+						}
+					}
+				}
+				if(clickEllipse!=null)
+				{
+					if(turn==PLAYER_ONE_TURN)      //玩家一黑色
+					{
+					    clickEllipse.fill=BLACK_COLOR;
+						turn=PLAYER_TWO_TURN;
+					}
+					else
+					{
+						clickEllipse.fill=WHITE_COLOR;    //玩家二白色
+						turn=PLAYER_ONE_TURN;
+					}
+				}
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:BorderContainer x="9.5" y="8.95" width="480" height="480" backgroundColor="#C3D6E3" id="board" click="boardHandler(event)">
+	</s:BorderContainer>
+	<s:Label x="10" y="496" text="五子棋" width="481" height="46" id="id_label_title" fontSize="36" textAlign="center" fontWeight="bold"/>
+	<s:Label x="142.2" y="550" text="黑子先下，五子连成线赢" width="227" height="26" fontSize="20" id="id_label_guize"/>
+</s:WindowedApplication>

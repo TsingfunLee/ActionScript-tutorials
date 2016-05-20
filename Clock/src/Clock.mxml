@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="windowedapplication1_creationCompleteHandler(event)" width="558" height="500">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FileEvent;
+			
+			private var time:Timer;     //定义一个计时器
+			private var time2:Timer;
+			private var time3:Timer;
+			//private var my_date:Date=new Date();   //系统时间
+			private var miaoZhen:int=0;  //秒针
+			private var fenZhen:int=0;   //分针
+			private var shiZhen:int=0;   //时针
+		
+			//public var s:Canvas=id_canvas_draw;      //定义一个变量，指向界面上的canvas
+			
+			protected function windowedapplication1_creationCompleteHandler(event)
+			{
+				time=new Timer(1000);     //时间间隔1000毫秒
+				time2=new Timer(1000*60);   //时间间隔1分钟
+				time3=new Timer(1000*60*60);   //时间间隔1小时
+				time.addEventListener(TimerEvent.TIMER,timeHandler);    //添加响应函数
+				time2.addEventListener(TimerEvent.TIMER,time2Handler);
+				time3.addEventListener(TimerEvent.TIMER,time3Handler);
+				time.start();    //启动定时器
+				//drawClock();
+			}
+			
+			public function drawClock():void
+			{
+				var s:Canvas=id_canvas_draw;      //定义一个变量，指向界面上的canvas
+				s.graphics.clear();
+				s.graphics.lineStyle(3,0xe512f2);   //设置画笔颜色
+				
+				s.graphics.drawCircle(150,150,100);  //画一个圆
+				
+				for(var i:int=0;i<60;i++)      //画时钟上的线
+				{
+					if(i%5==0)
+					{
+						s.graphics.lineStyle(3,0xe512f2);     //每5格画更粗更长的一条线
+						s.graphics.moveTo(150+85*Math.cos(i*6*Math.PI/180),150-85*Math.sin(i*6*Math.PI/180));
+						s.graphics.lineTo(150+100*Math.cos(i*6*Math.PI/180),150-100*Math.sin(i*6*Math.PI/180));
+					}
+					else
+					{
+						s.graphics.lineStyle(0,0xe512f2);
+						s.graphics.moveTo(150+90*Math.cos(i*6*Math.PI/180),150-90*Math.sin(i*6*Math.PI/180));
+						s.graphics.lineTo(150+100*Math.cos(i*6*Math.PI/180),150-100*Math.sin(i*6*Math.PI/180));
+					}
+				}
+				
+				//画秒针
+				s.graphics.moveTo(150,150);
+				s.graphics.lineTo(150+90*Math.cos(miaoZhen*6*Math.PI/180-Math.PI/2),150+90*Math.sin(miaoZhen*6*Math.PI/180-Math.PI/2));
+				//画分针
+				s.graphics.lineStyle(2,0xe512f2);
+				s.graphics.moveTo(150,150);
+				s.graphics.lineTo(150+80*Math.cos(fenZhen*6*Math.PI/180-Math.PI/2),150+80*Math.sin(fenZhen*6*Math.PI/180-Math.PI/2));
+				//画时针
+				s.graphics.lineStyle(3,0xe512f2);
+				s.graphics.moveTo(150,150);
+				s.graphics.lineTo(150+60*Math.cos(shiZhen*6*5*Math.PI/180-Math.PI/2),150+60*Math.sin(shiZhen*6*5*Math.PI/180-Math.PI/2));
+			}
+			
+			public function timeHandler(evt:TimerEvent):void
+			{
+				var my_date:Date=new Date();
+				id_textarea_time.text="时间："+my_date.getHours()+"："+my_date.getMinutes()+"："+my_date.getSeconds();
+				miaoZhen=my_date.getSeconds();
+				fenZhen=my_date.getMinutes();
+				shiZhen=my_date.getHours();
+				drawClock();
+			}
+			
+			public function time2Handler(evt:TimerEvent):void
+			{
+                var my_date:Date=new Date();
+				id_textarea_time.text="时间："+my_date.getHours()+"："+my_date.getMinutes()+"："+my_date.getSeconds();
+				miaoZhen=my_date.getSeconds();
+				fenZhen=my_date.getMinutes();
+				shiZhen=my_date.getHours();
+				drawClock();
+			}
+			
+			public function time3Handler(evt:TimerEvent):void
+			{
+				var my_date:Date=new Date();
+				id_textarea_time.text="时间："+my_date.getHours()+"："+my_date.getMinutes()+"："+my_date.getSeconds();
+				miaoZhen=my_date.getSeconds();
+				fenZhen=my_date.getMinutes();
+				shiZhen=my_date.getHours();
+				drawClock();
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<mx:Canvas x="65" y="53" width="281" height="372" id="id_canvas_draw"/>
+	<s:TextArea x="371" y="53" width="156" height="112" id="id_textarea_time" fontSize="20" fontWeight="bold"/>
+</s:WindowedApplication>

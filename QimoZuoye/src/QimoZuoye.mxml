@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" width="1024" height="768" creationComplete="windowedapplication1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			private var myPoint:Point=new Point();
+			private var time:Timer;//定义一个定时器
+			private var i:int=0;
+			var firsttime:Boolean=true;
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				
+				myPoint.x=0;
+				myPoint.y=0;
+				
+			}
+			public function drawcircle1(x:Number,y:Number,r2:Number,ang:Number):void
+			{
+				id_canvas.graphics.clear();
+				id_canvas.graphics.lineStyle(1,0x000000);
+				var xt:Number;
+				var yt:Number;
+				ang=ang*Math.PI/180;
+				xt=x+r2*Math.sin(ang);
+				yt=y+r2*Math.cos(ang);
+				id_canvas.graphics.moveTo(x,y);
+				id_canvas.graphics.lineTo(xt,yt);//AB/r2
+				
+				drawCircle2(xt,yt,205,-6,2700);
+			}
+			
+			public function drawCircle2(x:Number,y:Number,r3:Number,m:Number,n:Number):void
+			{
+				id_canvas.graphics.moveTo(400,300);
+				id_canvas.graphics.lineTo(700,250);	//静止斜线
+				
+				var xt:Number;
+				var yt:Number;
+				
+				yt=((26400+2*y-12*x)-Math.sqrt((12*x-2*y-26400)*(12*x-2*y-26400)-148*(4840000-4400*x+x*x+y*y-r3*r3)))/74;
+				xt=2200-6*yt;
+				id_canvas.graphics.moveTo(x,y);
+				id_canvas.graphics.lineTo(xt,yt);//BC/r3
+				
+				var xo:Number=400;
+				var yo:Number=400;
+				var n1:Number=xo-m*yo;
+				var m1:Number=m;
+				var m2:Number=(-1)/m;
+				var n2:Number=xt-m2*yt;			
+				var ys:Number=(n1-n2)/(m2-m1);
+				var xs:Number=m1*ys+n1;
+				id_canvas.graphics.moveTo(xo,yo);
+				id_canvas.graphics.lineTo(xs,ys);			
+				id_canvas.graphics.moveTo(xt,yt);
+				id_canvas.graphics.lineTo(xs,ys);//r1\r4		
+				
+				
+				drawCircle3(x,y,xt,yt,250,80,-6,2000);
+				
+				//id_canvas.graphics.lineStyle(2, 0x0000ff);
+				//id_canvas.graphics.drawCircle(x,y,r3);//以B为圆心，BC
+				//id_canvas.graphics.drawCircle(x,y,250);//以B为圆心，BP
+				//id_canvas.graphics.drawCircle(xt,yt,80);//以C为圆心，CP
+				
+			}
+			
+			public function drawCircle3(a:Number,b:Number,m:Number,n:Number,r:Number,R:Number,m1:Number,n1:Number):void //r为BP，R为CP
+			{
+				var xt:Number;
+				var xta:Number;
+				var xtb:Number;
+				var yt:Number;
+				var yta:Number;
+				var ytb:Number;
+				var A:Number=r*r-R*R+a*a-b*b+m*m+n*n-2*a*m;
+				var B=4*(m-a)*(m-a);
+				var AA:Number=(2*b-2*n)*(2*b-2*n)+B;
+				var BB:Number=2*A*(2*b-2*n)-2*B*b;
+				var CC:Number=A*A+B*b*b-B*r*r;
+				yta=(-BB-Math.sqrt(BB*BB-4*AA*CC))/(2*AA);
+				ytb=(-BB+Math.sqrt(BB*BB-4*AA*CC))/(2*AA);
+				yt=yta;
+				//xta=n+Math.sqrt(R*R-(yt-m)*(yt-m));
+				//xtb=n-Math.sqrt(R*R-(yt-m)*(yt-m));
+				xt=((r*r-R*R-a*a-b*b+m*m+n*n)/(2*m-2*a))-((n*yt-b*yt)/(m-a));//（xt,yt)为P
+				
+				
+				id_canvas.graphics.moveTo(a,b);
+				id_canvas.graphics.lineTo(xt,yt);//BP
+				
+				id_canvas.graphics.moveTo(m,n);
+				id_canvas.graphics.lineTo(xt,yt);//CP
+				
+				id_canvas.graphics.beginFill(0x9f9f9f,1.0);//三角形填色
+				id_canvas.graphics.moveTo(a,b);
+				id_canvas.graphics.lineTo(xt,yt);
+				id_canvas.graphics.lineTo(m,n);
+				id_canvas.graphics.lineTo(a,b);
+				id_canvas.graphics.endFill();
+				
+				
+				if(myPoint.x!=0)
+				{
+					id_canvas2.graphics.lineStyle(1, 0x000000);
+					id_canvas2.graphics.moveTo(myPoint.x,myPoint.y);
+					id_canvas2.graphics.lineTo(xt,yt);//8形不规则线
+					
+				}
+				myPoint.x=xt;
+				myPoint.y=yt;
+			}
+			
+			
+			public function timeHandler(evt:TimerEvent):void//定时器响应函数
+			{	
+				drawcircle1(400,400,100,i);//AB圆调用
+				i++;
+			}
+			
+			
+			
+			protected function id_button_start_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				time = new Timer(10); //初始化定时器，定时时间间隔为1000毫秒
+				time.addEventListener(TimerEvent.TIMER,timeHandler);//为定时器添加函数
+				time.start();//启动定时器
+			}
+			
+			protected function id_button_pause_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				if(firsttime)
+				{
+					firsttime=false;
+					time.stop();//停止定时器
+				}
+			}
+			
+			
+			protected function id_button_go_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				if(!firsttime)
+				{
+					firsttime=true;
+					time.start();//开启定时器
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<mx:Canvas x="0" y="0" width="1024" height="768" id="id_canvas">
+		<s:TextArea x="450" y="100" height="34" id="textarea" text="Crank-Slider" textAlign="center" fontFamily="Verdana" fontSize="14" width="117"/>
+	</mx:Canvas>
+	<mx:Canvas x="0" y="0" width="1024" height="768" id="id_canvas2">
+		<s:Label x="400" y="410" text="A" width="30" height="30" fontSize="13" id="id_text_A"/>
+		<s:Button x="474" y="69" label="暂停" id="id_button_pause" click="id_button_pause_clickHandler(event)"/>
+		<s:Button x="552" y="69" label="继续" id="id_button_go" click="id_button_go_clickHandler(event)"/>
+		<s:Button x="396" y="69" label="开始演示" id="id_button_start" click="id_button_start_clickHandler(event)"/>
+	</mx:Canvas>
+</s:WindowedApplication>
+

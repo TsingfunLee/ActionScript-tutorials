@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" width="800" height="600" creationComplete="windowedapplication1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.ColorPickerEvent;
+			import mx.events.FlexEvent;
+			
+			var s:Canvas=new Canvas;
+			var firstPoint:Point=new Point();     //定义起点，并初始化
+			var secondPoint:Point=new Point();
+			var drawType:int=11;      
+			var drawStyle:int=0;      //该变量等于1画直线，等于2画圆，等于3画矩形
+
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				id_textarea_state.text="欢迎进入画图程序";
+				this.addEventListener(MouseEvent.MOUSE_DOWN,mouseHandler);
+			}
+			
+			private function mouseHandler(e:MouseEvent):void
+			{
+				id_textarea_state.text="X:"+e.localX+"Y:"+e.localY;
+				if(drawType==11)
+				{
+					if(e.localX>600||e.localY>500)      //如果超出了区域
+					{
+						id_textarea_state.text="超出区域！";
+					}
+					else 
+					{
+						firstPoint.x=e.localX;     //获取第一个点的X坐标
+						firstPoint.y=e.localY;     //获取第一个点的y坐标
+						drawType=12;
+					}
+				}
+				else if(drawType==12)
+				{
+					if(e.localX>600||e.localY>500)      //如果超出了区域
+					{
+						id_textarea_state.text="超出区域！";
+					}
+					else 
+					{
+						secondPoint.x=e.localX;
+						secondPoint.y=e.localY;
+						MyDrawer();
+						drawType=11;
+					}
+				}
+			}
+			
+			private function MyDrawer():void
+			{
+				//var s:Canvas=id_canvas_draw;
+				s=id_canvas_draw;
+				s.graphics.lineStyle(2,id_color_drawcolor.selectedColor);
+				if(drawStyle==1)          //画直线
+				{
+				    s.graphics.moveTo(firstPoint.x,firstPoint.y);
+				    s.graphics.lineTo(secondPoint.x,secondPoint.y);
+				}
+				else if(drawStyle==2)     //画圆
+				{
+					var r:Number=Math.sqrt((secondPoint.y-firstPoint.y)*(secondPoint.y-firstPoint.y)+     //半径
+						(secondPoint.x-firstPoint.x)*(secondPoint.x-firstPoint.x));
+					s.graphics.drawCircle(firstPoint.x,firstPoint.y,r);
+				}
+				else if(drawStyle==3)      //画矩形
+				{
+					s.graphics.drawRect(firstPoint.x,firstPoint.y,secondPoint.x-firstPoint.x,secondPoint.y-firstPoint.y);
+				}
+				else if(drawStyle==4)
+				{
+					s.graphics.beginFill(id_color_drawcolor.selectedColor,1);
+					var r:Number=Math.sqrt((secondPoint.y-firstPoint.y)*(secondPoint.y-firstPoint.y)+     //半径
+						(secondPoint.x-firstPoint.x)*(secondPoint.x-firstPoint.x));
+					s.graphics.drawCircle(firstPoint.x,firstPoint.y,r);
+					s.graphics.endFill();
+				}
+				else if(drawStyle==5)
+				{
+					s.graphics.beginFill(id_color_drawcolor.selectedColor,1);
+					s.graphics.drawRect(firstPoint.x,firstPoint.y,secondPoint.x-firstPoint.x,secondPoint.y-firstPoint.y);
+					s.graphics.endFill();
+				}
+				else if(drawStyle==6)
+				{
+					s.graphics.drawRoundRect(firstPoint.x,firstPoint.y,secondPoint.x-firstPoint.x,secondPoint.y-firstPoint.y,10,5);
+				}
+			}
+
+
+			protected function id_button_line_clickHandler(event:MouseEvent):void      //直线按钮
+			{
+				// TODO Auto-generated method stub
+				drawStyle=1;
+				drawType=11;
+			}
+
+
+			protected function id_button_circle_clickHandler(event:MouseEvent):void     //圆形按钮
+			{
+				// TODO Auto-generated method stub
+				drawStyle=2;
+				drawType=11;
+			}
+
+
+			protected function id_button_rect_clickHandler(event:MouseEvent):void      //矩形按钮
+			{
+				// TODO Auto-generated method stub
+				drawStyle=3;
+				drawType=11;
+			}
+
+
+
+			protected function id_button_clear_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				s.graphics.clear();
+				drawType=11;
+				drawStyle=0;
+				id_textarea_state.text="图像已清空！";
+			}
+
+
+			protected function id_color_drawcolor_changeHandler(event:ColorPickerEvent):void
+			{
+				// TODO Auto-generated method stub
+				drawType=11;
+			}
+
+
+			protected function id_button_shixinJu_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				drawType=11;
+				drawStyle=5;
+			}
+
+
+			protected function id_button_shixinYuan_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				drawType=11;
+				drawStyle=4;
+			}
+
+
+			protected function id_button_YuanJu_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				drawType=11;
+				drawStyle=6;
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<mx:Canvas x="0" y="0" width="600" height="500" id="id_canvas_draw" dropShadowVisible="false" borderColor="#000000" contentBackgroundColor="#FFFFFF"/>
+	<s:TextArea x="0" y="516" width="600" height="52" id="id_textarea_state"/>
+	<mx:HRule x="0" y="498" width="600" id="id_HRule_drawborder"/>
+	<mx:VRule x="598" y="0" height="500" id="id_VRule_drawborder"/>
+	<s:Button x="638" y="45" label="直线" height="38" id="id_button_line" click="id_button_line_clickHandler(event)"/>
+	<s:Button x="638" y="91" label="圆" height="38" id="id_button_circle" click="id_button_circle_clickHandler(event)"/>
+	<s:Button x="638" y="137" label="矩形" height="38" id="id_button_rect" click="id_button_rect_clickHandler(event)"/>
+	<mx:ColorPicker x="638" y="340" id="id_color_drawcolor" change="id_color_drawcolor_changeHandler(event)"/>
+	<s:Button x="638" y="402" label="清空图像" id="id_button_clear" height="38" click="id_button_clear_clickHandler(event)"/>
+	<s:Button x="638" y="183" label="实心矩形" height="38" id="id_button_shixinJu" click="id_button_shixinJu_clickHandler(event)"/>
+	<s:Button x="638" y="229" label="实心圆形" height="38" id="id_button_shixinYuan" click="id_button_shixinYuan_clickHandler(event)"/>
+	<s:Button x="638" y="275" label="圆角矩形" height="38" id="id_button_YuanJu" click="id_button_YuanJu_clickHandler(event)"/>
+</s:WindowedApplication>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" width="960" height="640" creationComplete="windowedapplication1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.DataGridEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			import mx.events.ListEvent;
+			
+			import spark.components.TitleWindow;
+			
+			[Bindable]
+			public var dataColl:ArrayCollection=new ArrayCollection();   //声明一个数组，该数组与表格进行数据绑定
+			
+			var k=1;   //ID编号
+			var bookobj:Object;   //图书对象
+			var languageobj:String="中文";   //语言
+			var p:int=0;       //行数，默认为0
+			var myContextMenu:ContextMenu;
+
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				popUpMenu();
+			}
+
+
+			protected function add_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var gname=bname.text;
+				var gwriter=writer.text;
+				var gyear=year.text;
+				var gbooknum=booknum.text;
+				
+				if(gname!=""&&gbooknum!="")
+				{
+					if(gwriter=="")
+					{
+						writer.text="无";
+						//year.text="无";
+						//type.text="无";
+					}
+					if(gyear=="")
+					{
+						//writer.text="无";
+						year.text="无";
+						//type.text="无";
+					}
+					dataprovider();
+				}
+				else
+				{
+					Alert.show("书名或书号不能为空！");
+				}
+				
+				var totalnum:String;
+				totalnum=p.toString();
+				total.text=totalnum;
+			}
+			
+			
+			protected function reset_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+			    bname.text="";
+				writer.text="";
+				booknum.text="";
+				year.text="";
+			}
+
+			
+			public function dataprovider():Object{
+				bookobj=new Object();         //定义一个用户
+				bookobj["uid"]=k;           //设置图书ID
+				bookobj["bname"]=bname.text;      //获取书名
+				bookobj["writer"]=writer.text;    //获取作者
+			    bookobj["language"]=languageobj;           //获取语言
+				bookobj["booknum"]=booknum.text;     //书号
+				bookobj["year"]=year.text;   //出版年份
+				//bookobj["type"]=type.text;   //类型
+				dataColl.addItem(bookobj);     //把图书添加到数组中 
+				k++;
+				p++;
+				return bookobj;
+			}
+			
+			protected function sexClick(event:ItemClickEvent):void
+			{
+				if(event.currentTarget.selectedValue=="m")
+				{
+					languageobj=chinese.label;
+				}else if(event.currentTarget.selectedValue=="f")
+				{
+					languageobj=english.label;
+				}else
+				{
+					languageobj=japanese.label;
+				}
+			}
+			
+			private function popUpMenu():void 
+			{ 
+				myContextMenu = new ContextMenu(); 
+				removeDefaultItems(); 
+				addCustomMenuItems(); 
+				//监听右键菜单弹出后的事件 
+				myContextMenu.addEventListener(ContextMenuEvent.MENU_SELECT, menuSelectedHandler); 
+				userdata.contextMenu = myContextMenu; 
+			} 
+
+			//删除原有菜单项 
+			private function removeDefaultItems():void 
+			{ 
+				myContextMenu.hideBuiltInItems(); 
+				var defaultItems:ContextMenuBuiltInItems = myContextMenu.builtInItems; 
+				defaultItems.print = false; 
+			} 
+			
+			//添加用户自定义菜单项 
+			private function addCustomMenuItems():void 
+			{ 
+				var item:ContextMenuItem = new ContextMenuItem("删除行"); 
+				//默认的菜单项 
+				item.visible = false; 
+				myContextMenu.customItems.push(item); 
+				//监听选择菜单项后的事件 
+				item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, itemSelectedHandler); 
+			} 
+			
+			//弹出菜单后的事件处理函数 
+			private function menuSelectedHandler(event:ContextMenuEvent):void 
+			{ 
+				var item:ContextMenuItem = myContextMenu.customItems[0] as ContextMenuItem; 
+				
+				if (userdata.selectedIndex >= 0) 
+				{ 
+					item.visible = true; 
+				} 
+				else 
+				{ 
+					item.visible = false; 
+				} 
+			} 
+			
+			//选择菜单项后的事件处理函数 
+			private function itemSelectedHandler(event:ContextMenuEvent):void 
+			{ 
+				
+				if (userdata.selectedIndex >= 0) 
+				{ 
+					userdata.dataProvider.removeItemAt(userdata.selectedIndex); 
+					p--;
+					var totalnum:String;
+					totalnum=p.toString();
+					total.text=totalnum;
+				} 
+			} 
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<s:RadioButtonGroup id="radiogroup_sex"/>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<mx:Form x="316" y="17" width="328" height="278" id="id_form_form">
+		<mx:Text text="   书单" width="293" height="35" id="id_text_title" textAlign="center" fontSize="25" color="#3C83C6" fontWeight="bold" fontFamily="Arial"/>
+		<mx:FormItem label="书名" id="uname_label">
+			<mx:TextInput id="bname" width="159"/>
+		</mx:FormItem>
+		<mx:RadioButtonGroup id="sexgroup" itemClick="sexClick(event)"/>
+		<mx:FormItem label="语言" id="sexgroup_label">
+		    <mx:HBox>
+				<mx:RadioButton id="chinese" label="中文" groupName="sexgroup" value="m" selected="true"/>
+				<mx:RadioButton id="english" label="英文" groupName="sexgroup" value="f"/>
+				<mx:RadioButton id="japanese" label="日文" groupName="sexgroup" value="j"/>
+			</mx:HBox>
+		</mx:FormItem>
+		<mx:FormItem label="作者" textAlign="left">
+			<mx:TextInput width="159" id="writer"/>
+		</mx:FormItem>
+		<mx:FormItem label="书号">
+			<s:TextInput id="booknum" width="159"/>
+		</mx:FormItem>
+		<mx:FormItem label="出版年份">
+			<mx:TextInput id="year" width="159"/>
+		</mx:FormItem>
+		<mx:HBox horizontalAlign="center" width="284">
+			<mx:Button id="add" label="添加" textAlign="center" click="add_clickHandler(event)"/>
+			<mx:Button id="reset" label="重置" textAlign="center" click="reset_clickHandler(event)"/>
+		</mx:HBox>
+		<mx:FormItem label="总数">
+			<s:TextArea height="20" width="159" id="total"/>
+		</mx:FormItem>
+	</mx:Form>
+	
+	<mx:DataGrid x="184" y="303" width="585" id="userdata" dataProvider="{dataColl}" alternatingItemColors="[#7dcdf2,#d9e8ef]">
+		<mx:columns>
+			<mx:DataGridColumn headerText="ID" dataField="uid"/>
+			<mx:DataGridColumn headerText="书名" dataField="bname"/>
+			<mx:DataGridColumn headerText="语言" dataField="language"/>
+			<mx:DataGridColumn dataField="writer" headerText="作者"/>
+			<mx:DataGridColumn dataField="booknum" headerText="书号"/>
+			<mx:DataGridColumn dataField="year" headerText="出版年份"/>
+		</mx:columns>
+	</mx:DataGrid>
+</s:WindowedApplication>

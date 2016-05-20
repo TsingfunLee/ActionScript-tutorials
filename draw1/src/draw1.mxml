@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" width="1000" height="800" creationComplete="windowedapplication1_creationCompleteHandler(event)" >
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			var time:Timer;
+			var timeCount:Number;
+			var moveCenterPoint:Boolean=false;
+			var myPoint1:Point=new Point();
+			var myPoint2:Point=new Point();
+			var drawAssistant:Boolean=false;
+			
+			
+			var centerPoint:Point=new Point();
+			var R:Number;
+			var angle:Number;
+			var lineK:Number;
+			var lineB:Number;
+			
+			var Length1:Number;
+			var Length2:Number;
+			var Length3:Number;
+			
+			
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				setInitValues();
+				initTime();			
+			}
+			
+			function timeHandler(evt:TimerEvent):void
+			{
+				setDynamicValue();
+				drawFirstPart(centerPoint.x,centerPoint.y,R,angle);
+				MoveCenter();
+				angle++;			  
+			}
+			
+			function setInitValues():void
+			{
+				timeCount=0;
+				centerPoint.x=400;
+				centerPoint.y=400;			
+				angle=0;
+				
+				id_button1.x=centerPoint.x-id_button1.width/2;
+				id_button1.y=centerPoint.y-id_button1.height/2;
+			}
+			
+			function setDynamicValue():void
+			{
+				R=id_R.value;
+				Length1=id_Length1.value;
+				Length2=id_Length2.value;
+				Length3=id_Length3.value;
+				lineK=id_lineK.value;
+				lineB=id_lineB.value;
+			}
+			
+			function MoveCenter():void
+			{
+				if(moveCenterPoint)
+				{			
+					centerPoint.x=id_button1.x=this.mouseX-id_button1.width/2;
+					centerPoint.y=id_button1.y=this.mouseY-id_button1.height/2;
+					timeCount=0;
+				}
+			}
+			
+			function drawFirstPart(x:Number,y:Number,r:Number,ang:Number):void
+			{
+				id_canvas.graphics.clear();
+				id_canvas.graphics.lineStyle(2, 0x000000);
+				id_canvas.graphics.moveTo(x,y);
+				var m_x:Number;
+				var m_y:Number;
+				ang=ang*Math.PI/180;
+				m_x=x+r*Math.sin(ang);
+				m_y=y+r*Math.cos(ang);
+				id_canvas.graphics.lineTo(m_x,m_y);			
+				drawSecondPart(m_x,m_y,Length1,lineK,lineB);
+			}
+			
+			function drawSecondPart(x:Number,y:Number,r:Number,m:Number,n:Number):void
+			{								
+				var A:Number=m*m+1;
+				var B:Number=2*m*n-2*x*m-2*y;
+				var C:Number=n*n-2*x*n+x*x+y*y-r*r;
+				var m_y:Number=(-B-Math.sqrt(B*B-4*A*C))/(2*A);
+				var m_x:Number=m*m_y+n;
+				
+				var n1:Number=centerPoint.x-m*centerPoint.y;
+				var m1:Number=m;
+				var m2:Number=(-1)/m;
+				var n2:Number=m_x-m2*m_y;			
+				var n_y:Number=(n1-n2)/(m2-m1);
+				var n_x:Number=m1*n_y+n1;
+				
+				id_canvas.graphics.moveTo(x,y);
+				id_canvas.graphics.lineTo(m_x,m_y);
+				
+				id_canvas.graphics.moveTo(centerPoint.x,centerPoint.y);
+				id_canvas.graphics.lineTo(n_x,n_y);			
+				id_canvas.graphics.moveTo(m_x,m_y);
+				id_canvas.graphics.lineTo(n_x,n_y);			
+				
+				drawThirdPart(x,y,m_x,m_y,Length2,Length3);
+				drawAssitantCircle(x,y,r,m_x,m_y);
+				
+				
+			}
+			
+			function drawThirdPart(a:Number,b:Number,m:Number,n:Number,r:Number,R:Number):void
+			{
+				var m_x:Number;
+				var m_xa:Number;
+				var m_xb:Number;
+				var m_y:Number;
+				var m_ya:Number;
+				var m_yb:Number;
+				var A:Number=r*r-R*R+a*a-b*b+m*m+n*n-2*a*m;
+				var B:Number=4*(m-a)*(m-a);
+				var AA:Number=(2*b-2*n)*(2*b-2*n)+B;
+				var BB:Number=2*A*(2*b-2*n)-2*B*b;
+				var CC:Number=A*A+B*b*b-B*r*r;
+				m_ya=(-BB-Math.sqrt(BB*BB-4*AA*CC))/(2*AA);
+				m_yb=(-BB+Math.sqrt(BB*BB-4*AA*CC))/(2*AA);
+				m_y=m_ya;
+				m_xa=n+Math.sqrt(R*R-(m_y-m)*(m_y-m));
+				m_xb=n-Math.sqrt(R*R-(m_y-m)*(m_y-m));
+				//m_x=m_xa;
+				m_x=((r*r-R*R-a*a-b*b+m*m+n*n)/(2*m-2*a))-((n*m_y-b*m_y)/(m-a));
+				
+				
+				id_canvas.graphics.moveTo(a,b);
+				id_canvas.graphics.lineTo(m_x,m_y);
+				
+				id_canvas.graphics.moveTo(m,n);
+				id_canvas.graphics.lineTo(m_x,m_y);
+				
+				id_canvas.graphics.beginFill(0xffd200,1.0);
+				id_canvas.graphics.moveTo(a,b);
+				id_canvas.graphics.lineTo(m_x,m_y);
+				id_canvas.graphics.lineTo(m,n);
+				id_canvas.graphics.lineTo(a,b);
+				id_canvas.graphics.endFill();
+				
+				if(timeCount==0)
+					id_track.graphics.clear();
+				if(timeCount<=360)
+				{
+					if(myPoint1.x!=0)
+					{
+						id_track.graphics.lineStyle(2, 0x000000);
+						id_track.graphics.moveTo(myPoint1.x,myPoint1.y);
+						id_track.graphics.lineTo(m,n);
+						
+					}
+					myPoint1.x=m;
+					myPoint1.y=n;
+					if(myPoint2.x!=0)
+					{
+						id_track.graphics.moveTo(myPoint2.x,myPoint2.y);
+						id_track.graphics.lineTo(m_x,m_y);
+						
+					}
+					myPoint2.x=m_x;
+					myPoint2.y=m_y;
+					timeCount++;
+				}
+			}
+			
+			function drawAssitantCircle(x:Number,y:Number,r:Number,m_x:Number,m_y:Number):void
+			{
+				if(drawAssistant)
+				{
+					id_canvas.graphics.lineStyle(2, 0xff0000);
+					id_canvas.graphics.drawCircle(x,y,r);
+					id_canvas.graphics.drawCircle(x,y,Length2);
+					id_canvas.graphics.drawCircle(m_x,m_y,Length3);
+				}
+			}
+			
+			protected function initTime():void
+			{
+				time = new Timer(10);
+				time.addEventListener(TimerEvent.TIMER,timeHandler);
+				time.start();
+			}
+			
+			
+			protected function id_button1_mouseDownHandler(event:MouseEvent):void
+			{
+				moveCenterPoint=true;
+			}
+			
+			
+			protected function id_button1_mouseUpHandler(event:MouseEvent):void
+			{
+				moveCenterPoint=false;
+			}
+			
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				drawAssistant=!drawAssistant;
+			}
+			
+			
+			protected function id_R_changeHandler(event:Event):void
+			{
+				// TODO Auto-generated method stub
+				timeCount=0;
+			}
+			
+			protected function id_reset_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				R=id_R.value=100;
+				Length1=id_Length1.value=205;
+				Length2=id_Length2.value=250;
+				Length3=id_Length3.value=80;
+				lineK=id_lineK.value=-6;
+				lineB=id_lineB.value=2400;
+				timeCount=0;
+				id_canvas.graphics.clear();
+				id_track.graphics.clear();
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<mx:Canvas x="0" y="0" width="1000" height="800" id="id_canvas">
+	</mx:Canvas>
+	<mx:Canvas x="0" y="0" width="1000" height="800" id="id_track">
+		<s:Button x="370" y="336" label="按钮" width="9" height="12" id="id_button1"  mouseDown="id_button1_mouseDownHandler(event)" mouseUp="id_button1_mouseUpHandler(event)"/>
+		<s:Button x="787" y="85" label="辅助圆" click="button1_clickHandler(event)"/>
+		<s:HSlider x="757" y="137" id="id_R" minimum="0" liveDragging="true" maximum="500" value="100" change="id_R_changeHandler(event)"/>
+		<s:Label x="634" y="137" text="转动圆半径" width="92" height="17" fontSize="17"/>
+		<s:Label x="638" y="181" text="三角形边长1" width="111" height="17" fontSize="17"/>
+		<s:Label x="638" y="227" text="三角形边长2" width="111" height="17" fontSize="17"/>
+		<s:HSlider x="757" y="182" id="id_Length1" minimum="0" maximum="500" value="205" change="id_R_changeHandler(event)"/>
+		<s:HSlider x="757" y="229" id="id_Length2" minimum="0" maximum="500" value="250" change="id_R_changeHandler(event)"/>
+		<s:HSlider x="757" y="278" minimum="0" maximum="500" value="80" change="id_R_changeHandler(event)" id="id_Length3"/>
+		<s:Label x="638" y="278" text="三角形边长3" width="111" height="17" fontSize="17"/>
+		<s:Label x="638" y="367" text="定直线斜率" width="111" height="17" fontSize="17"/>
+		<s:Label x="638" y="398" text="定直线截距" width="111" height="17" fontSize="17"/>
+		<s:HSlider x="757" y="367" minimum="-100" maximum="100" value="-6" change="id_R_changeHandler(event)" id="id_lineK"/>
+		<s:HSlider x="757" y="400" minimum="2000" maximum="5000" value="2400" change="id_R_changeHandler(event)" id="id_lineB"/>
+		<s:Button x="669" y="85" label="重置(点两次)" id="id_reset" click="id_reset_clickHandler(event)"/>
+	</mx:Canvas>
+</s:WindowedApplication>

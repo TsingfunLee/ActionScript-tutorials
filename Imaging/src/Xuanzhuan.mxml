@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx">
+
+	<fx:Script>
+		<![CDATA[
+			import org.osmf.events.TimeEvent;
+			var time:Timer;
+			var i=1;
+			var angle=5;
+			var timecount:int=0;
+			
+			protected function id_button_xuanzhuan_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				if(i==1)
+				{
+					time=new Timer(100);
+				    time.addEventListener(TimerEvent.TIMER,timeHandler);
+					time.start();
+				    id_button_xuanzhuan.label="停止";
+					i=2;
+					id_textarea_text.text="抽奖中……\n抽中黄色中奖";
+				}
+				else
+				{
+					time.stop();
+					id_button_xuanzhuan.label="旋转";
+					i=1;
+					var jiaodu;
+					timecount=time.currentCount+timecount;
+					jiaodu=(timecount*angle*180/Math.PI)%360;
+					if((jiaodu>=60&&jiaodu<=90)||(jiaodu>=150&&jiaodu<=180)||(jiaodu>=240&&jiaodu<=270)||(jiaodu>=330&&jiaodu<=360))
+					{
+					    id_textarea_text.text="中奖！";
+					}
+					else
+					{
+						id_textarea_text.text="很遗憾，没中奖。";
+					}
+				
+				}
+			}
+			
+			public function timeHandler(event:TimerEvent):void
+			{
+				var m:Matrix = id_image.transform.matrix;
+				var p:Point = m.transformPoint(new Point(id_image.width/2, id_image.height/2));
+				//var angle=-5;
+				m.translate(-p.x, -p.y);
+				m.rotate(-angle);
+				m.translate(p.x, p.y);
+				id_image.transform.matrix = m;
+			}
+			
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<mx:Image x="214" y="103" width="256" height="256" source="@Embed(source='../img/zp.png')" id="id_image"/>
+	<s:Button x="601" y="123" label="旋转" id="id_button_xuanzhuan" click="id_button_xuanzhuan_clickHandler(event)"/>
+	<mx:Image x="246.55" y="212.5" width="117" height="48" source="@Embed(source='../img/zj.png')" id="id_zz"/>
+	<s:TextArea x="571" y="212" width="156" height="58" id="id_textarea_text" text="幸运大转盘！"/>
+</s:WindowedApplication>

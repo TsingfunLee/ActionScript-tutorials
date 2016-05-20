@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="windowedapplication1_creationCompleteHandler(event)" width="786" height="550">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			private var moveX:int=0;          //方块水平位置
+			private var moveY:int=0;          //方块垂直位置
+			private var moveStepx:int=50;      //每次水平移动步数
+			private var moveStepy:int=0;       //每次垂直移动步数
+			private var derection:int=1;      //方向
+			private var MaxBorderx:int=400;       //最大移动步数
+			private var MinBorderx:int=0;
+			private var MaxBordery:int=400;
+			private var MinBordery:int=0;
+			private var time:Timer;
+
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				id_textarea_text.text="欢迎进入游戏";
+				time=new Timer(1000);
+				time.addEventListener(TimerEvent.TIMER,timeHandler);
+				time.start();
+				drawBlock();
+				this.addEventListener(Event.ADDED_TO_STAGE,onAddedToStage);
+				function onAddedToStage(e:Event):void
+				{
+					stage.addEventListener(KeyboardEvent.KEY_DOWN,myKeyDown);
+				}
+			}
+			
+			public function timeHandler(evt:TimerEvent):void
+			{
+				moveX+=moveStepx;
+				moveY+=moveStepy;
+			    if(moveX>MaxBorderx)
+				{
+					id_textarea_text.text="GAME OVER";
+					time.stop();
+					id_button_begingame.label="重新开始";
+				}
+				else if(moveX==MaxBorderx)
+				{
+					MaxBorderx-=50;
+				}
+				else if(moveX<MaxBorderx)
+				{
+					if(derection==3||derection==4)
+					{
+						id_textarea_text.text="GAME OVER";
+						time.stop();
+						id_button_begingame.label="重新开始";
+					}
+					else if(moveX<MinBorderx)
+					{
+						id_textarea_text.text="GAME OVER";
+						time.stop();
+						id_button_begingame.label="重新开始";
+					}
+					else if(moveX==MinBorderx)
+					{
+						MinBorderx+=50;
+					}
+				}
+				
+				if(moveY>MaxBordery)
+				{
+					id_textarea_text.text="GAME OVER";
+					time.stop();
+					id_button_begingame.label="重新开始";
+				}
+				else if(moveY==MaxBordery)
+				{
+					MaxBordery-=50;
+				}
+				else if(moveY<MaxBordery)
+				{
+					if(derection!=3)
+					{
+						id_textarea_text.text="GAME OVER";
+						time.stop();
+						id_button_begingame.label="重新开始";
+					}
+					else if(moveY<MinBordery)
+					{
+						id_textarea_text.text="GAME OVER";
+						time.stop();
+						id_button_begingame.label="重新开始";
+					}
+					else if(moveY==MinBordery)
+					{
+						MinBordery+=50;
+					}
+				}
+				
+				
+				
+				drawBlock();
+			}
+			
+			public function myKeyDown(evt:KeyboardEvent):void
+			{
+				if(evt.keyCode==39)
+				{
+					moveStepx=50;
+					moveStepy=0;
+					derection=1;
+					//moveX=moveX+moveStep;
+				}
+				else if(evt.keyCode==37)
+				{
+					moveStepx=-50;
+					moveStepy=0;
+					derection=2;
+					//moveX=moveX-moveStep;
+				}
+				else if(evt.keyCode==40)
+				{
+					moveStepy=50;
+					moveStepx=0;
+					derection=3;
+					//moveY=moveY+moveStepy;
+				}
+				else if(evt.keyCode==38)
+				{
+					moveStepy=-50;
+					moveStepx=0;
+					derection=4;
+					//moveY=moveY-moveStepy;
+				}
+				//drawBlock();
+			}
+			
+			public function drawBlock():void
+			{
+				var s:Canvas=id_canvas_draw;
+				var s2:Canvas=id_canvas_draw2;
+				s.graphics.clear();
+				s.graphics.lineStyle(3,0xff0000,0.1);
+				for(var i:int=0;i<10;i++)
+				{
+					s.graphics.moveTo(0,i*50);
+					s.graphics.lineTo(450,i*50);
+				}
+                for(var i:int=0;i<10;i++)
+				{
+					s.graphics.moveTo(i*50,0);
+					s.graphics.lineTo(i*50,450);
+				}
+				s2.graphics.beginFill(0x0000ff,0.2);
+				s2.graphics.drawRect(moveX,moveY,50,50);
+				s2.graphics.endFill();
+				s.graphics.beginFill(0x00ff00,0.5);
+				s.graphics.drawRect(moveX,moveY,50,50);
+				s.graphics.endFill();
+			}
+
+			protected function id_button_begingame_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				moveX=-50;
+				moveY=0;
+				moveStepx=50;
+				moveStepy=0;
+				id_button_begingame.label="开始游戏";
+				id_textarea_text.text="欢迎进入游戏";
+				time.start();
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<mx:Canvas x="10" y="10" width="499" height="476" id="id_canvas_draw">
+		<mx:Canvas x="0" y="0" width="499" height="476" id="id_canvas_draw2"/>
+	</mx:Canvas>
+	<s:TextArea x="543" y="25" id="id_textarea_text" contentBackgroundColor="#FFFFFF" symbolColor="#000000" chromeColor="#CCCCCC" borderVisible="true" borderColor="#696969" fontSize="14" color="#EC2B2B"/>
+	<s:Button x="583" y="255" label="开始游戏" width="111" height="46" id="id_button_begingame" click="id_button_begingame_clickHandler(event)" fontSize="18" fontWeight="normal" fontFamily="Arial"/>
+</s:WindowedApplication>

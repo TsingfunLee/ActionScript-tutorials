@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx">
+
+	<fx:Script>
+		<![CDATA[
+			var bili1:Number=0.8;    //缩小比例
+			var bili2:Number=1.2;    //放大比例
+			var julix:Number=10;     //水平移动距离
+			var t:int=1;
+			
+			protected function id_button_fangda_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				id_image1.width=id_image1.width*bili2;
+				id_image1.height=id_image1.height*bili2;
+			}
+
+			protected function id_button_suoxiao_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				id_image1.width=id_image1.width*bili1;
+				id_image1.height=id_image1.height*bili1;
+			}
+
+			protected function id_image1_clickHandler(event:MouseEvent):void
+			{
+				id_image1.x=id_image1.x+julix;
+			}
+
+			protected function id_button_yincang_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				if(t==1)
+				{
+					id_image1.visible=false;
+					t=2;
+					id_button_yincang.label="显示";
+				}
+				else 
+				{
+					id_image1.visible=true;
+					t=1;
+					id_button_yincang.label="隐藏";
+				}
+			}
+
+			protected function id_image21_clickHandler(event:MouseEvent):void
+			{
+				id_image21.visible=false;
+			}
+			
+			protected function id_image2_clickHandler(event:MouseEvent):void
+			{
+				id_image21.visible=true;
+			}
+
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<mx:Image click="id_image1_clickHandler(event)" x="69" y="48" source="@Embed(source='../img/Water lilies.jpg')" width="292" id="id_image1" height="219"/>
+	<mx:Image click="id_image2_clickHandler(event)" x="393" y="48" width="292" height="219" source="@Embed(source='../img/Water lilies.jpg')" id="id_image2"/>
+	<mx:Image click="id_image21_clickHandler(event)" x="393" y="48" width="292" height="219" source="@Embed(source='../img/Sunset.jpg')" id="id_image21"/>
+	<s:Button x="752" y="77" label="放大" id="id_button_fangda" click="id_button_fangda_clickHandler(event)"/>
+	<s:Button x="752" y="133" label="缩小" id="id_button_suoxiao" click="id_button_suoxiao_clickHandler(event)"/>
+	<s:Button x="752" y="193" label="隐藏" id="id_button_yincang" click="id_button_yincang_clickHandler(event)"/>
+	
+</s:WindowedApplication>

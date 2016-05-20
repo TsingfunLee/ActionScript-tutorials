@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="windowedapplication1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import flashx.textLayout.formats.Float;
+			
+			import mx.events.FlexEvent;
+			
+			var time:Timer;
+			
+			var pointA:Point;
+			var pointB:Point;
+			var pointC:Point;
+			var pointP:Point;
+			
+			var r1:Number=100; 
+			var r2:Number=100;         //A、B连线的长度
+			var r3:Number=200;         //B、C连线的长度
+			var r4:Number=50;
+			var theta:Number=0;    //A、B点连线和x轴的夹角\
+			var bata:Number=15*Math.PI/180;     //点C所在直线的倾斜角
+			
+			//var a:Number=Math.atan(r4/r1);    //A,C连线和r1之间的夹角
+			//var r:Number=r1/Math.cos(a);      //A,C连线长度
+			//var x1:Number=200+r*Math.cos(bata+a);    //C点X、Y坐标
+			//var y1:Number=300-r*Math.sin(bata+a);
+			var k:Number=-Math.tan(bata);
+			//var b:Number=r4/Math.cos(bata)+300;
+			var b:Number=350-300*k;
+
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				pointA=new Point(200,300);
+				pointB=new Point(0,0);
+				pointC=new Point(300,350);    //C点初始位置
+				pointP=new Point(0,0);
+				
+				time=new Timer(100);
+				time.addEventListener(TimerEvent.TIMER,timeHandler); 
+				time.start();
+			}
+			
+			protected function draw():void
+			{
+				var c:Canvas=id_Canvas;
+				c.graphics.clear();
+				c.graphics.lineStyle(1,0xff0000,1);        //线的颜色
+				c.graphics.moveTo(pointA.x,pointA.y);      //A、B连线
+				c.graphics.lineTo(pointB.x,pointB.y);
+				
+				c.graphics.moveTo(300,350);          //点C所在的直线
+				c.graphics.lineTo(500,k*500+b);
+				c.graphics.drawRect(pointC.x-5,pointC.y-5,10,10);     //中心是C点的小正方形
+				
+				c.graphics.moveTo(pointB.x,pointB.y);
+				c.graphics.lineTo(pointC.x,pointC.y);
+			}
+			
+			protected function timeHandler(evt:TimerEvent):void
+			{
+				pointB.x=r2*Math.cos(theta)+pointA.x;
+				pointB.y=r2*Math.sin(theta)+pointA.y;
+				theta=theta+5*Math.PI/180;
+				
+				var a1:Number=1+k*k;
+				var b1:Number=2*k*b-2*pointB.x-2*k*pointB.y;
+				var c1:Number=b*b-2*b*pointB.y-r3*r3;
+				var dalta:Number=Math.sqrt(b1*b1-4*a1*c1);
+				pointC.x=(-b+dalta)/2*a1;
+				pointC.y=k*pointC.x+b;
+				
+				draw();
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<mx:Canvas x="0" y="0" width="1056" height="496" id="id_Canvas"/>
+</s:WindowedApplication>

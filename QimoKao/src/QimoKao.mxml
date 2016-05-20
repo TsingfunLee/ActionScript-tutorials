@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="windowedapplication1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import flashx.textLayout.formats.Float;
+			
+			var time:Timer;
+			
+			var pointA:Point;
+			var pointB:Point;
+			var pointC:Point;
+			var pointP:Point;
+			
+			var rAB:Number=100;
+			var rBC:Number=200;
+			//var rBP:Number=250;
+			//var rPC:Number=100;
+			var angleAB:Number=0;
+			var k=-1/3;
+			var bb=350;
+			
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				pointA=new Point(200,300);
+				pointB=new Point(0,0);
+				pointC=new Point(0,0);    //C点初始位置
+				pointP=new Point(0,0);
+				
+				id_Lable_A.text="A";
+				
+				time=new Timer(10);
+				time.addEventListener(TimerEvent.TIMER,timeHandler); 
+				time.start();
+			}
+			
+			protected function draw():void
+			{
+				var c:Canvas=id_Canvas;
+				var c2:Canvas=id_Canvas2;
+				c.graphics.clear();
+				c.graphics.lineStyle(1,0x000000,1);        //线的颜色
+				c.graphics.moveTo(pointA.x,pointA.y);      //A、B连线
+				c.graphics.lineTo(pointB.x,pointB.y);
+				
+                
+				c.graphics.drawRect(pointC.x-5,pointC.y-5,10,10);     //中心是C点的小正方形
+				
+//				c.graphics.lineStyle(1,0xff0000,1);
+//				c.graphics.moveTo(pointB.x,pointB.y);    //BC
+//				c.graphics.lineTo(pointC.x,pointC.y);
+//				c.graphics.drawCircle(pointB.x,pointB.y,rBC);
+//				
+//				c.graphics.lineStyle(1,0x00ff00,1);
+//				c.graphics.moveTo(pointB.x,pointB.y);    //BP
+//				c.graphics.lineTo(pointP.x,pointP.y);
+//				c.graphics.drawCircle(pointB.x,pointB.y,rBP);
+//				
+//				c.graphics.lineStyle(1,0x0000ff,1);
+//				c.graphics.moveTo(pointP.x,pointP.y);   //PC
+//				c.graphics.lineTo(pointC.x,pointC.y);
+//				c.graphics.drawCircle(pointC.x,pointC.y,rPC);
+				
+				c.graphics.lineStyle(1,0x000000,1);
+				c.graphics.moveTo(270,260);     //静止直线
+				c.graphics.lineTo(600,150);
+				
+			    c.graphics.lineStyle(1,0x000000,1);
+				c.graphics.beginFill(0x7bd8ff,0.5);
+				c.graphics.moveTo(pointB.x,pointB.y);    // 填充三角形
+				c.graphics.lineTo(pointC.x,pointC.y);
+				c.graphics.lineTo(pointP.x,pointP.y);
+				c.graphics.lineTo(pointB.x,pointB.y); 
+				c.graphics.endFill();
+				
+				c2.graphics.lineStyle(1,0x000000,1);
+				c2.graphics.moveTo(pointP.x,pointP.y);    //P的轨迹
+				c2.graphics.lineTo(pointP.x+1,pointP.y+1);
+				
+			}
+			
+			protected function timeHandler(evt:TimerEvent):void
+			{
+				pointB.x=pointA.x+rAB*Math.cos(angleAB);
+				pointB.y=pointA.y+rAB*Math.sin(angleAB);
+				//计算出C点
+				var a:Number=1+k*k;
+				var b:Number=(-2)*pointB.x+2*bb*k-2*k*pointB.y;
+				var c:Number=pointB.x*pointB.x+pointB.y*pointB.y+bb*bb-2*bb*pointB.y-rBC*rBC;
+				var dalta:Number=Math.sqrt(b*b-4*a*c);
+				pointC.x=(-b+dalta)/(2*a);
+				pointC.y=k*pointC.x+bb;
+				
+				
+//				var m:Number=(rBP*rBP-rPC*rPC+pointC.x*pointC.x+pointC.y*pointC.y-pointB.x*pointB.x-pointB.y*pointB.y)/(-2.0*(pointB.y+pointC.y));
+//				var n:Number=-(pointB.x+pointC.x)*1.0/(pointB.y+pointC.y);
+//				var a1:Number=1+n*n;
+//				var b1:Number=-2*pointB.x+2*m*n-2*pointB.y*n;
+//				var c1:Number=pointB.x*pointB.x+pointB.y*pointB.y+m*m-2*pointB.y*m-rBP*rBP;
+//				var dalta1:Number=Math.sqrt(Math.abs(b1*b1-4*a1*c1));
+//				pointP.x=(-b1+dalta1)/(2*a1);
+//				pointP.y=m+n*pointP.x;
+				
+				//计算出P点
+				pointP.x=(pointB.x*(1/Math.tan(113*Math.PI/180))+(pointC.x)*(1/Math.tan(20*Math.PI/180))+pointC.y-pointB.y)
+					/((1/Math.tan(20*Math.PI/180))+(1/Math.tan(113*Math.PI/180)));
+				pointP.y=(pointB.y*(1/Math.tan(113*Math.PI/180))+(pointC.y)*(1/Math.tan(20*Math.PI/180))+pointB.x-pointC.x)
+					/((1/Math.tan(20*Math.PI/180))+(1/Math.tan(113*Math.PI/180)));
+				
+				angleAB=angleAB+0.5*Math.PI/180;
+				
+				draw();
+				
+			}
+			
+			protected function id_Button_stop_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				time.stop();
+			}
+			
+			protected function id_Button_continue_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				time.start();
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<mx:Canvas x="0" y="0" width="1056" height="496" id="id_Canvas2"/>
+	<mx:Canvas x="0" y="0" width="1056" height="496" id="id_Canvas"/>
+	
+	<mx:Label id="id_Lable_A" x="200" y="300"/>
+	<mx:Button id="id_Button_stop" label="暂停" x="200" y="50" click="id_Button_stop_clickHandler(event)"/>
+	<mx:Button id="id_Button_continue" label="继续" x="300" y="50" click="id_Button_continue_clickHandler(event)"/>
+</s:WindowedApplication>
